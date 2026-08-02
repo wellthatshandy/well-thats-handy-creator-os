@@ -1,32 +1,28 @@
-# Well, That's Handy Creator OS v0.4
+# Well, That's Handy Creator OS v0.4 — Corrected
 
-## Guided Idea Coach Release
+This release is built directly from the exact Version 0.3 package.
 
-Version 0.4 replaces the manual self-scoring form with a real guided coaching experience.
+## Preserved from Version 0.3
+- Dashboard
+- Creator Library
+- Full-content search
+- Related resources
+- Video Brief Builder
+- Project detail pages
+- Existing local browser data key
 
-### New features
-
-- Automatic idea scoring
-- Guided Strong / Moderate / Weak / Unsure questions
-- Category-by-category score breakdown
-- Specific feedback for audience, emotion, visual proof, originality, channel fit, credibility, and series potential
+## Changed in Version 0.4
+- Guided Idea Coach replaces manual self-scoring
+- Automatic scoring
+- Category explanations
 - Strongest factor and biggest opportunity
-- Suggested stronger angle
-- Title directions
-- Thumbnail directions
-- Recommended next step
-- Revise and Rescore workflow
+- Stronger-angle recommendation
+- Title and thumbnail directions
+- Revise and Rescore
 - Complete evaluation saved to the Idea Vault
 
-## Deployment
+## Important
+After deployment, open the main production address:
+https://well-thats-handy-creator-os.vercel.app
 
-Replace the six files in the GitHub repository root:
-
-- app.js
-- creator-photo.jpg
-- index.html
-- README.md
-- styles.css
-- vercel.json
-
-Commit the changes. Vercel will deploy Version 0.4 automatically.
+Preview deployment addresses use separate browser storage and can appear to have reset data.

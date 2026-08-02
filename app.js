@@ -160,18 +160,18 @@ return '<label>'+label+
 function launchIdeaValidator(prefill){
 prefill=prefill||{};
 modal('Guided Video Idea Coach',
-'<div class="coach-intro"><b>You describe the idea. The Creator OS scores it.</b><p>Choose the answer that best fits each category. The tool will explain the score and show you how to strengthen the idea.</p></div>'+
+'<div class="coach-intro"><b>You describe the idea. The Creator OS evaluates it.</b><p>No manual math. Answer the guided questions and the coach will explain the result.</p></div>'+
 field('ivIdea','Working idea','textarea','Describe the video idea in one or two sentences.')+
 field('ivViewer','Target viewer','text','Who specifically is this for?')+
 field('ivPromise','Viewer promise','textarea','What will the viewer know, feel, avoid, save, or achieve?')+
 field('ivAngle','Distinctive angle','textarea','Why this video instead of a standard version of the topic?')+
-field('ivProof','What can you show?','textarea','Result, before/after, test, process, evidence, cost, or transformation')+
+field('ivProof','What can you show?','textarea','Before/after, test, result, process, evidence, cost, or transformation')+
 field('ivCred','Why are you credible to make it?','textarea','Personal experience, real experiment, expertise, or case study')+
 selectField('ivAudience','Audience demand','How many people likely care about this problem, desire, or curiosity?')+
-selectField('ivEmotion','Emotional pull','Does the idea involve money, time, independence, surprise, fear, relief, status, or aspiration?')+
+selectField('ivEmotion','Emotional pull','Does the idea involve money, time, freedom, surprise, fear, relief, status, or aspiration?')+
 selectField('ivVisualScore','Visual proof','Can the result or transformation be clearly shown?')+
 selectField('ivOriginal','Originality','Does the angle feel meaningfully different from common videos on the topic?')+
-selectField('ivFit','Channel fit','Does it strongly support “Come build an AI-powered life with me”?')+
+selectField('ivFit','Channel fit','Does it support “Come build an AI-powered life with me”?')+
 selectField('ivCredScore','Credibility','Can you show real experience, evidence, or a genuine experiment?')+
 selectField('ivSeries','Series potential','Could this naturally lead to another useful video?')+
 '<p><button class="gold" data-action="scoreIdea">Evaluate My Idea</button></p>');
@@ -198,42 +198,6 @@ function scoreCategory(value,max){
 var normalized=(Math.max(1,Math.min(4,value))-1)/3;
 return Math.round(normalized*max);
 }
-function titleSuggestions(item){
-var idea=item.title||'this idea';
-var promise=item.promise||'a practical result';
-var angle=item.angle||'an AI-powered experiment';
-var lower=idea.toLowerCase();
-var suggestions=[];
-if(lower.indexOf('hair')>=0||lower.indexOf('salon')>=0){
-suggestions=[
-'I Let ChatGPT Tell Me How to Color My Hair',
-'Can AI Replace My Hairdresser?',
-'I Used ChatGPT to Cut My Salon Costs—Here’s What Happened'
-];
-}else{
-suggestions=[
-'I Used AI to '+idea.replace(/^using\s+/i,''),
-'Can AI Really Help With '+idea+'?',
-'I Tried an AI-Powered Way to '+promise
-];
-}
-return suggestions;
-}
-function thumbnailSuggestions(item){
-var lower=(item.title+' '+item.promise+' '+item.angle).toLowerCase();
-if(lower.indexOf('hair')>=0||lower.indexOf('salon')>=0){
-return [
-'Split image: salon price on one side, finished hair on the other',
-'ChatGPT screen beside a close-up of the before/after result',
-'Your reaction with simple text: “AI vs. Salon”'
-];
-}
-return [
-'Show the clearest before-and-after contrast',
-'Pair the AI tool with the final real-world result',
-'Use one strong emotional reaction and one short outcome phrase'
-];
-}
 function categoryAdvice(key,value){
 var advice={
 audience:{
@@ -244,27 +208,27 @@ audience:{
 },
 emotion:{
 4:'Strong emotional stakes give people a reason to stop scrolling.',
-3:'There is some emotional value, but it should be more visible in the package.',
+3:'There is emotional value, but it should be more visible in the package.',
 2:'The idea sounds useful but not yet urgent or emotionally compelling.',
 1:'Add a clear stake such as money, time, freedom, fear, relief, or aspiration.'
 },
 visual:{
-4:'The result can be shown clearly, which strengthens both the video and thumbnail.',
+4:'The result can be shown clearly, strengthening both the video and thumbnail.',
 3:'Some proof exists, but the strongest visual moment needs to be planned.',
 2:'The video risks becoming mostly explanation.',
 1:'Identify a concrete before/after, experiment, comparison, or visible result.'
 },
 original:{
-4:'The angle feels distinctive and difficult to confuse with a generic tutorial.',
-3:'The core topic is familiar, but the framing gives it some freshness.',
+4:'The angle feels distinctive and hard to confuse with a generic tutorial.',
+3:'The topic is familiar, but the framing adds freshness.',
 2:'The idea currently resembles many existing videos.',
 1:'Make the AI experiment, personal stakes, constraint, or surprising test the hero.'
 },
 fit:{
-4:'This strongly reinforces the channel promise and your practical AI identity.',
+4:'This strongly reinforces the channel promise and practical-AI identity.',
 3:'It fits, but the AI-powered-life connection could be clearer.',
-2:'The topic may belong on the channel only if the AI role is essential.',
-1:'Reframe the idea so AI meaningfully changes the outcome, not just the wording.'
+2:'The topic belongs only if AI meaningfully changes the outcome.',
+1:'Reframe it so AI is essential—not merely mentioned.'
 },
 cred:{
 4:'You can show authentic experience or proof, which builds trust.',
@@ -275,11 +239,41 @@ cred:{
 series:{
 4:'The idea naturally opens a larger journey viewers can follow.',
 3:'There is at least one logical follow-up.',
-2:'The idea may stand alone without strengthening the broader channel narrative.',
+2:'The idea may stand alone without strengthening the larger channel story.',
 1:'Add a next experiment or progress update that keeps the story moving.'
 }
 };
 return advice[key][value]||advice[key][1];
+}
+function titleSuggestions(item){
+var text=(item.title+' '+item.promise+' '+item.angle).toLowerCase();
+if(text.indexOf('hair')>=0||text.indexOf('salon')>=0){
+return [
+'I Let ChatGPT Tell Me How to Color My Hair',
+'Can AI Replace My Hairdresser?',
+'I Used ChatGPT to Cut My Salon Costs—Here’s What Happened'
+];
+}
+return [
+'I Used AI to Test: '+item.title,
+'Can AI Really Help With '+item.title+'?',
+'I Tried an AI-Powered Way to '+item.promise
+];
+}
+function thumbnailSuggestions(item){
+var text=(item.title+' '+item.promise+' '+item.angle).toLowerCase();
+if(text.indexOf('hair')>=0||text.indexOf('salon')>=0){
+return [
+'Salon price on one side and the finished hair result on the other',
+'ChatGPT screen beside a clear before-and-after',
+'Your reaction with short text: “AI vs. Salon”'
+];
+}
+return [
+'Show the clearest before-and-after contrast',
+'Pair the AI tool with the real-world result',
+'Use one emotional reaction and one short outcome phrase'
+];
 }
 function scoreIdea(){
 var required=['ivIdea','ivViewer','ivPromise','ivAngle'];
@@ -306,8 +300,12 @@ fit:scoreCategory(raw.fit,15),
 cred:scoreCategory(raw.cred,10),
 series:scoreCategory(raw.series,10)
 };
-var total=Object.keys(scores).reduce(function(sum,k){return sum+scores[k]},0);
-var verdict=total>=80?'Strong production candidate':total>=65?'Worth developing—improve the packaging first':total>=45?'Promising core idea—needs a stronger angle':'Rethink the framing before production';
+var total=Object.keys(scores).reduce(function(sum,key){return sum+scores[key]},0);
+var verdict=total>=80?'Strong production candidate':
+total>=65?'Worth developing—improve the packaging first':
+total>=45?'Promising core idea—needs a stronger angle':
+'Rethink the framing before production';
+
 var item={
 id:Date.now(),
 title:el('ivIdea').value,
@@ -320,7 +318,8 @@ status:total>=80?'Approved':'Evaluating',
 score:total,
 evaluation:{raw:raw,scores:scores,verdict:verdict}
 };
-data.ideas.unshift(item);save();
+data.ideas.unshift(item);
+save();
 
 var rows=[
 ['Audience Demand','audience',20],
@@ -330,8 +329,8 @@ var rows=[
 ['Channel Fit','fit',15],
 ['Credibility','cred',10],
 ['Series Potential','series',10]
-].map(function(r){
-var label=r[0],key=r[1],max=r[2];
+].map(function(row){
+var label=row[0],key=row[1],max=row[2];
 return '<article class="coach-breakdown">'+
 '<div><b>'+label+'</b><span>'+band(raw[key])+'</span></div>'+
 '<strong>'+scores[key]+'/'+max+'</strong>'+
@@ -347,13 +346,17 @@ var thumbs=thumbnailSuggestions(item);
 modal('Idea Coach Result',
 '<div class="result-score">'+total+'<span>/100</span></div>'+
 '<h3 class="verdict">'+verdict+'</h3>'+
-'<div class="coach-summary"><p><b>Strongest factor:</b> '+categoryAdvice(strongest,raw[strongest])+'</p>'+
-'<p><b>Biggest opportunity:</b> '+categoryAdvice(weak[0],raw[weak[0]])+'</p></div>'+
+'<div class="coach-summary">'+
+'<p><b>Strongest factor:</b> '+categoryAdvice(strongest,raw[strongest])+'</p>'+
+'<p><b>Biggest opportunity:</b> '+categoryAdvice(weak[0],raw[weak[0]])+'</p>'+
+'</div>'+
 '<h3>Score Breakdown</h3><div class="coach-grid">'+rows+'</div>'+
-'<h3>Stronger Angle</h3><div class="callout">Make the real-world stakes and the AI experiment the center of the story. Lead with what changes for the viewer—not merely the steps you followed.</div>'+
+'<h3>Stronger Angle</h3>'+
+'<div class="callout">Make the real-world stakes and the AI experiment the center of the story. Lead with what changes for the viewer—not merely the steps you followed.</div>'+
 '<h3>Title Directions</h3><ol>'+titles.map(function(t){return '<li>'+esc(t)+'</li>'}).join('')+'</ol>'+
 '<h3>Thumbnail Directions</h3><ul>'+thumbs.map(function(t){return '<li>'+esc(t)+'</li>'}).join('')+'</ul>'+
-'<h3>Recommended Next Step</h3><div class="callout">'+
+'<h3>Recommended Next Step</h3>'+
+'<div class="callout">'+
 (total>=80?'Move into the Video Brief Builder and define the package before scripting.':
 total>=65?'Revise the title, thumbnail promise, and visible proof, then rescore.':
 'Strengthen the audience promise, emotional stakes, and distinctive AI angle before production.')+
@@ -365,14 +368,14 @@ total>=65?'Revise the title, thumbnail promise, and visible proof, then rescore.
 window._lastIdeaForRevision=item;
 }
 function reviseIdea(){
-var i=window._lastIdeaForRevision||{};
+var item=window._lastIdeaForRevision||{};
 launchIdeaValidator({
-idea:i.title||'',
-viewer:i.audience||'',
-promise:i.promise||'',
-angle:i.angle||'',
-proof:i.proof||'',
-cred:i.credibility||''
+idea:item.title||'',
+viewer:item.audience||'',
+promise:item.promise||'',
+angle:item.angle||'',
+proof:item.proof||'',
+cred:item.credibility||''
 });
 }
 function launchBriefBuilder(){
