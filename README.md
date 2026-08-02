@@ -1,19 +1,32 @@
-# Well, That's Handy Creator OS v0.3
+# Well, That's Handy Creator OS v0.4
 
-## Creator Intelligence Release
+## Guided Idea Coach Release
 
-Version 0.3 makes the Creator OS genuinely interactive.
+Version 0.4 replaces the manual self-scoring form with a real guided coaching experience.
 
 ### New features
-- Full-content Creator Library search
-- Rich resource reader with related resources
-- Interactive Video Idea Validator with a 100-point score
-- Validated ideas save to the Idea Vault
-- Interactive Video Brief Builder
-- Saved video briefs
-- Clickable project detail pages
-- Project tools linked to templates, reviews, and analytics
-- New Creator OS Video Brief resource
+
+- Automatic idea scoring
+- Guided Strong / Moderate / Weak / Unsure questions
+- Category-by-category score breakdown
+- Specific feedback for audience, emotion, visual proof, originality, channel fit, credibility, and series potential
+- Strongest factor and biggest opportunity
+- Suggested stronger angle
+- Title directions
+- Thumbnail directions
+- Recommended next step
+- Revise and Rescore workflow
+- Complete evaluation saved to the Idea Vault
 
 ## Deployment
-Replace the six files in the GitHub repository root and commit. Vercel will deploy Version 0.3 automatically.
+
+Replace the six files in the GitHub repository root:
+
+- app.js
+- creator-photo.jpg
+- index.html
+- README.md
+- styles.css
+- vercel.json
+
+Commit the changes. Vercel will deploy Version 0.4 automatically.

@@ -145,32 +145,235 @@ type=type||'text';placeholder=placeholder||'';
 if(type==='textarea')return '<label>'+label+'<textarea id="'+id+'" placeholder="'+placeholder+'"></textarea></label>';
 return '<label>'+label+'<input id="'+id+'" type="'+type+'" placeholder="'+placeholder+'"></label>';
 }
-function launchIdeaValidator(){
-modal('Interactive Video Idea Validator',
+
+function selectField(id,label,help){
+return '<label>'+label+
+(help?'<small class="field-help">'+help+'</small>':'')+
+'<select id="'+id+'">'+
+'<option value="">Choose one</option>'+
+'<option value="4">Strong</option>'+
+'<option value="3">Moderate</option>'+
+'<option value="2">Weak</option>'+
+'<option value="1">Unsure</option>'+
+'</select></label>';
+}
+function launchIdeaValidator(prefill){
+prefill=prefill||{};
+modal('Guided Video Idea Coach',
+'<div class="coach-intro"><b>You describe the idea. The Creator OS scores it.</b><p>Choose the answer that best fits each category. The tool will explain the score and show you how to strengthen the idea.</p></div>'+
 field('ivIdea','Working idea','textarea','Describe the video idea in one or two sentences.')+
 field('ivViewer','Target viewer','text','Who specifically is this for?')+
-field('ivPromise','Video promise','textarea','What will the viewer know, feel, avoid, or achieve?')+
-field('ivAngle','Distinctive angle','textarea','Why this video instead of the others?')+
-field('ivVisual','What I can show','textarea','Result, contrast, proof, process, or evidence')+
-field('ivCred','Why I am credible','textarea','Experience, result, experiment, or case study')+
-'<div class="score-grid">'+
-field('ivAudience','Audience need /20','number')+
-field('ivClarity','Promise clarity /20','number')+
-field('ivDistinct','Distinctiveness /15','number')+
-field('ivVisualScore','Visual potential /15','number')+
-field('ivFit','Channel fit /15','number')+
-field('ivCredScore','Credibility /10','number')+
-field('ivSeries','Series potential /5','number')+
-'</div><p><button class="gold" data-action="scoreIdea">Calculate and Save</button></p>');
+field('ivPromise','Viewer promise','textarea','What will the viewer know, feel, avoid, save, or achieve?')+
+field('ivAngle','Distinctive angle','textarea','Why this video instead of a standard version of the topic?')+
+field('ivProof','What can you show?','textarea','Result, before/after, test, process, evidence, cost, or transformation')+
+field('ivCred','Why are you credible to make it?','textarea','Personal experience, real experiment, expertise, or case study')+
+selectField('ivAudience','Audience demand','How many people likely care about this problem, desire, or curiosity?')+
+selectField('ivEmotion','Emotional pull','Does the idea involve money, time, independence, surprise, fear, relief, status, or aspiration?')+
+selectField('ivVisualScore','Visual proof','Can the result or transformation be clearly shown?')+
+selectField('ivOriginal','Originality','Does the angle feel meaningfully different from common videos on the topic?')+
+selectField('ivFit','Channel fit','Does it strongly support “Come build an AI-powered life with me”?')+
+selectField('ivCredScore','Credibility','Can you show real experience, evidence, or a genuine experiment?')+
+selectField('ivSeries','Series potential','Could this naturally lead to another useful video?')+
+'<p><button class="gold" data-action="scoreIdea">Evaluate My Idea</button></p>');
+setTimeout(function(){
+if(prefill.idea)el('ivIdea').value=prefill.idea;
+if(prefill.viewer)el('ivViewer').value=prefill.viewer;
+if(prefill.promise)el('ivPromise').value=prefill.promise;
+if(prefill.angle)el('ivAngle').value=prefill.angle;
+if(prefill.proof)el('ivProof').value=prefill.proof;
+if(prefill.cred)el('ivCred').value=prefill.cred;
+},0);
+}
+function getChoice(id){
+var node=el(id);
+return node&&node.value?Number(node.value):1;
+}
+function band(v){
+if(v>=4)return 'Strong';
+if(v===3)return 'Moderate';
+if(v===2)return 'Weak';
+return 'Unsure';
+}
+function scoreCategory(value,max){
+var normalized=(Math.max(1,Math.min(4,value))-1)/3;
+return Math.round(normalized*max);
+}
+function titleSuggestions(item){
+var idea=item.title||'this idea';
+var promise=item.promise||'a practical result';
+var angle=item.angle||'an AI-powered experiment';
+var lower=idea.toLowerCase();
+var suggestions=[];
+if(lower.indexOf('hair')>=0||lower.indexOf('salon')>=0){
+suggestions=[
+'I Let ChatGPT Tell Me How to Color My Hair',
+'Can AI Replace My Hairdresser?',
+'I Used ChatGPT to Cut My Salon Costs—Here’s What Happened'
+];
+}else{
+suggestions=[
+'I Used AI to '+idea.replace(/^using\s+/i,''),
+'Can AI Really Help With '+idea+'?',
+'I Tried an AI-Powered Way to '+promise
+];
+}
+return suggestions;
+}
+function thumbnailSuggestions(item){
+var lower=(item.title+' '+item.promise+' '+item.angle).toLowerCase();
+if(lower.indexOf('hair')>=0||lower.indexOf('salon')>=0){
+return [
+'Split image: salon price on one side, finished hair on the other',
+'ChatGPT screen beside a close-up of the before/after result',
+'Your reaction with simple text: “AI vs. Salon”'
+];
+}
+return [
+'Show the clearest before-and-after contrast',
+'Pair the AI tool with the final real-world result',
+'Use one strong emotional reaction and one short outcome phrase'
+];
+}
+function categoryAdvice(key,value){
+var advice={
+audience:{
+4:'Large, recognizable audience with a clear need or curiosity.',
+3:'There is a real audience, but the framing should become more specific.',
+2:'The audience may be too narrow or the need is not yet obvious.',
+1:'Define exactly who this is for and why they would care.'
+},
+emotion:{
+4:'Strong emotional stakes give people a reason to stop scrolling.',
+3:'There is some emotional value, but it should be more visible in the package.',
+2:'The idea sounds useful but not yet urgent or emotionally compelling.',
+1:'Add a clear stake such as money, time, freedom, fear, relief, or aspiration.'
+},
+visual:{
+4:'The result can be shown clearly, which strengthens both the video and thumbnail.',
+3:'Some proof exists, but the strongest visual moment needs to be planned.',
+2:'The video risks becoming mostly explanation.',
+1:'Identify a concrete before/after, experiment, comparison, or visible result.'
+},
+original:{
+4:'The angle feels distinctive and difficult to confuse with a generic tutorial.',
+3:'The core topic is familiar, but the framing gives it some freshness.',
+2:'The idea currently resembles many existing videos.',
+1:'Make the AI experiment, personal stakes, constraint, or surprising test the hero.'
+},
+fit:{
+4:'This strongly reinforces the channel promise and your practical AI identity.',
+3:'It fits, but the AI-powered-life connection could be clearer.',
+2:'The topic may belong on the channel only if the AI role is essential.',
+1:'Reframe the idea so AI meaningfully changes the outcome, not just the wording.'
+},
+cred:{
+4:'You can show authentic experience or proof, which builds trust.',
+3:'You have some credibility, but more evidence would strengthen the story.',
+2:'The viewer may wonder why you are the right person to make this.',
+1:'Design a real experiment, document the process, and show receipts.'
+},
+series:{
+4:'The idea naturally opens a larger journey viewers can follow.',
+3:'There is at least one logical follow-up.',
+2:'The idea may stand alone without strengthening the broader channel narrative.',
+1:'Add a next experiment or progress update that keeps the story moving.'
+}
+};
+return advice[key][value]||advice[key][1];
 }
 function scoreIdea(){
-var ids=['ivAudience','ivClarity','ivDistinct','ivVisualScore','ivFit','ivCredScore','ivSeries'];
-var total=ids.reduce(function(sum,id){return sum+(Number(el(id).value)||0)},0);
-if(total>100)total=100;
-var verdict=total>=80?'Strong production candidate':total>=65?'Improve the packaging before production':'Park or rethink the idea';
-var item={id:Date.now(),title:el('ivIdea').value||'Untitled Idea',audience:el('ivViewer').value,status:total>=80?'Approved':'Evaluating',score:total,promise:el('ivPromise').value,angle:el('ivAngle').value,visual:el('ivVisual').value,credibility:el('ivCred').value};
+var required=['ivIdea','ivViewer','ivPromise','ivAngle'];
+var missing=required.filter(function(id){return !el(id).value.trim()});
+if(missing.length){
+toast('Complete the idea, viewer, promise, and angle first.');
+return;
+}
+var raw={
+audience:getChoice('ivAudience'),
+emotion:getChoice('ivEmotion'),
+visual:getChoice('ivVisualScore'),
+original:getChoice('ivOriginal'),
+fit:getChoice('ivFit'),
+cred:getChoice('ivCredScore'),
+series:getChoice('ivSeries')
+};
+var scores={
+audience:scoreCategory(raw.audience,20),
+emotion:scoreCategory(raw.emotion,15),
+visual:scoreCategory(raw.visual,15),
+original:scoreCategory(raw.original,15),
+fit:scoreCategory(raw.fit,15),
+cred:scoreCategory(raw.cred,10),
+series:scoreCategory(raw.series,10)
+};
+var total=Object.keys(scores).reduce(function(sum,k){return sum+scores[k]},0);
+var verdict=total>=80?'Strong production candidate':total>=65?'Worth developing—improve the packaging first':total>=45?'Promising core idea—needs a stronger angle':'Rethink the framing before production';
+var item={
+id:Date.now(),
+title:el('ivIdea').value,
+audience:el('ivViewer').value,
+promise:el('ivPromise').value,
+angle:el('ivAngle').value,
+proof:el('ivProof').value,
+credibility:el('ivCred').value,
+status:total>=80?'Approved':'Evaluating',
+score:total,
+evaluation:{raw:raw,scores:scores,verdict:verdict}
+};
 data.ideas.unshift(item);save();
-modal('Idea Validation Result','<div class="result-score">'+total+'<span>/100</span></div><h3>'+verdict+'</h3><p><b>Idea:</b> '+esc(item.title)+'</p><p><b>Promise:</b> '+esc(item.promise)+'</p><p><b>Angle:</b> '+esc(item.angle)+'</p><p><button class="gold" data-page="ideas">Open Idea Vault</button></p>');
+
+var rows=[
+['Audience Demand','audience',20],
+['Emotional Pull','emotion',15],
+['Visual Proof','visual',15],
+['Originality','original',15],
+['Channel Fit','fit',15],
+['Credibility','cred',10],
+['Series Potential','series',10]
+].map(function(r){
+var label=r[0],key=r[1],max=r[2];
+return '<article class="coach-breakdown">'+
+'<div><b>'+label+'</b><span>'+band(raw[key])+'</span></div>'+
+'<strong>'+scores[key]+'/'+max+'</strong>'+
+'<p>'+categoryAdvice(key,raw[key])+'</p>'+
+'</article>';
+}).join('');
+
+var weak=Object.keys(raw).sort(function(a,b){return raw[a]-raw[b]}).slice(0,2);
+var strongest=Object.keys(raw).sort(function(a,b){return raw[b]-raw[a]})[0];
+var titles=titleSuggestions(item);
+var thumbs=thumbnailSuggestions(item);
+
+modal('Idea Coach Result',
+'<div class="result-score">'+total+'<span>/100</span></div>'+
+'<h3 class="verdict">'+verdict+'</h3>'+
+'<div class="coach-summary"><p><b>Strongest factor:</b> '+categoryAdvice(strongest,raw[strongest])+'</p>'+
+'<p><b>Biggest opportunity:</b> '+categoryAdvice(weak[0],raw[weak[0]])+'</p></div>'+
+'<h3>Score Breakdown</h3><div class="coach-grid">'+rows+'</div>'+
+'<h3>Stronger Angle</h3><div class="callout">Make the real-world stakes and the AI experiment the center of the story. Lead with what changes for the viewer—not merely the steps you followed.</div>'+
+'<h3>Title Directions</h3><ol>'+titles.map(function(t){return '<li>'+esc(t)+'</li>'}).join('')+'</ol>'+
+'<h3>Thumbnail Directions</h3><ul>'+thumbs.map(function(t){return '<li>'+esc(t)+'</li>'}).join('')+'</ul>'+
+'<h3>Recommended Next Step</h3><div class="callout">'+
+(total>=80?'Move into the Video Brief Builder and define the package before scripting.':
+total>=65?'Revise the title, thumbnail promise, and visible proof, then rescore.':
+'Strengthen the audience promise, emotional stakes, and distinctive AI angle before production.')+
+'</div>'+
+'<div class="reader-actions">'+
+'<button class="gold" data-action="reviseIdea">Revise and Rescore</button>'+
+'<button class="secondary" data-page="ideas">Save and Open Idea Vault</button>'+
+'</div>');
+window._lastIdeaForRevision=item;
+}
+function reviseIdea(){
+var i=window._lastIdeaForRevision||{};
+launchIdeaValidator({
+idea:i.title||'',
+viewer:i.audience||'',
+promise:i.promise||'',
+angle:i.angle||'',
+proof:i.proof||'',
+cred:i.credibility||''
+});
 }
 function launchBriefBuilder(){
 modal('Build a Video Brief',
@@ -205,6 +408,7 @@ if(b.dataset.action==='launchIdeaValidator')launchIdeaValidator();
 if(b.dataset.action==='scoreIdea')scoreIdea();
 if(b.dataset.action==='launchBriefBuilder')launchBriefBuilder();
 if(b.dataset.action==='saveBrief')saveBrief();
+if(b.dataset.action==='reviseIdea')reviseIdea();
 if(b.dataset.copyResource){var r=library.find(function(x){return String(x.id)===String(b.dataset.copyResource)});navigator.clipboard.writeText(resourcePlainText(r)).then(function(){toast('Resource copied')}).catch(function(){toast('Select and copy the text manually')})}
 if(b.dataset.action==='boost')el('boostText').textContent='“'+boosts[Math.floor(Math.random()*boosts.length)]+'”';
 if(b.dataset.action==='coach'){if(data.settings.coach)window.open(data.settings.coach,'_blank');else show('settings')}

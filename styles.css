@@ -20,3 +20,15 @@
 .project-detail-grid small,.project-detail-grid strong{display:block}.project-detail-grid strong{font-size:19px;margin-top:5px}
 .project-tools{display:flex;gap:8px;flex-wrap:wrap}
 @media(max-width:760px){.related-grid,.score-grid,.project-detail-grid{grid-template-columns:1fr}}
+
+.coach-intro{background:#f7f0e3;border-left:4px solid var(--gold);padding:12px;border-radius:8px;margin-bottom:12px}
+.field-help{display:block;font-weight:400;color:var(--muted);margin:4px 0 6px;line-height:1.35}
+.coach-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.coach-breakdown{border:1px solid var(--line);border-radius:10px;padding:12px;background:#fff}
+.coach-breakdown>div{display:flex;justify-content:space-between;gap:8px}
+.coach-breakdown>div span{font-size:11px;color:#a56c11;font-weight:800}
+.coach-breakdown strong{display:block;font-size:22px;margin:7px 0}
+.coach-breakdown p{margin:0;color:#4a5568;font-size:12px;line-height:1.45}
+.coach-summary{background:#fbf7ef;border:1px solid var(--line);border-radius:10px;padding:12px}
+.verdict{text-align:center;color:#9a640d}
+@media(max-width:760px){.coach-grid{grid-template-columns:1fr}}
