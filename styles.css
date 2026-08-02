@@ -32,3 +32,13 @@
 .coach-summary{background:#fbf7ef;border:1px solid var(--line);border-radius:10px;padding:12px}
 .verdict{text-align:center;color:#9a640d}
 @media(max-width:760px){.coach-grid{grid-template-columns:1fr}}
+
+.research-actions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}
+.decision-banner{background:#06223d;color:#fff;border-radius:10px;padding:12px;text-align:center;margin-bottom:14px}
+.written-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.written-review{border:1px solid var(--line);border-radius:10px;padding:12px;background:#fff}
+.written-review h4{margin:0 0 8px}
+.written-review h4 span{float:right;font-size:10px;color:#a56c11;text-transform:uppercase}
+.written-review p{font-size:12px;line-height:1.45;color:#4a5568}
+.rewrite{background:#f7f0e3;border-radius:8px;padding:10px;font-size:12px;line-height:1.45}
+@media(max-width:760px){.written-grid{grid-template-columns:1fr}}

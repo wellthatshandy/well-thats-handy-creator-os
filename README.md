@@ -1,28 +1,20 @@
-# Well, That's Handy Creator OS v0.4 — Corrected
+# Well, That's Handy Creator OS v0.5 — Idea Coach Final
 
-This release is built directly from the exact Version 0.3 package.
+This release completes the first stable Idea Coach workflow.
 
-## Preserved from Version 0.3
-- Dashboard
-- Creator Library
-- Full-content search
-- Related resources
-- Video Brief Builder
-- Project detail pages
-- Existing local browser data key
+Included:
+- Idea definition
+- Lightweight audience-demand evidence
+- Broad market demand separated from the specific video angle
+- Automatic scoring and confidence rating
+- Written-answer review and suggested refinements
+- Dropdown preservation during Revise and Rescore
+- Audience-demand research request generator
+- Similar-video research request generator
+- Research notes
+- Approve, Revise, Research More, or Park decisions
+- Advance to Video Brief
+- Full evaluation saved to the Idea Vault
 
-## Changed in Version 0.4
-- Guided Idea Coach replaces manual self-scoring
-- Automatic scoring
-- Category explanations
-- Strongest factor and biggest opportunity
-- Stronger-angle recommendation
-- Title and thumbnail directions
-- Revise and Rescore
-- Complete evaluation saved to the Idea Vault
-
-## Important
-After deployment, open the main production address:
-https://well-thats-handy-creator-os.vercel.app
-
-Preview deployment addresses use separate browser storage and can appear to have reset data.
+Important limitation:
+The current static website cannot independently browse the live internet. It creates structured research requests for ChatGPT. Direct in-app research requires a secure cloud/API integration in a later release.
