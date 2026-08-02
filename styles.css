@@ -42,3 +42,9 @@
 .written-review p{font-size:12px;line-height:1.45;color:#4a5568}
 .rewrite{background:#f7f0e3;border-radius:8px;padding:10px;font-size:12px;line-height:1.45}
 @media(max-width:760px){.written-grid{grid-template-columns:1fr}}
+
+.white-space-card{background:#eef7f0;border:1px solid #b9d8bf;border-left:5px solid #37814a;border-radius:9px;padding:14px;line-height:1.55}
+.stage-gate{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin:12px 0}
+.stage-gate article{border:1px solid var(--line);border-radius:10px;padding:14px;background:#fff}
+.stage-gate .arrow{font-size:28px;color:var(--gold)}
+@media(max-width:760px){.stage-gate{grid-template-columns:1fr}.stage-gate .arrow{transform:rotate(90deg);text-align:center}}

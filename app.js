@@ -147,6 +147,7 @@ return '<label>'+label+'<input id="'+id+'" type="'+type+'" placeholder="'+placeh
 }
 
 
+
 function selectField(id,label,help){
 return '<label>'+label+(help?'<small class="field-help">'+help+'</small>':'')+
 '<select id="'+id+'"><option value="">Choose one</option><option value="4">Strong</option><option value="3">Moderate</option><option value="2">Weak</option><option value="1">Unsure</option></select></label>';
@@ -157,34 +158,180 @@ return '<label>'+label+(help?'<small class="field-help">'+help+'</small>':'')+
 options.map(function(o){return '<option value="'+o[0]+'">'+o[1]+'</option>'}).join('')+
 '</select></label>';
 }
-function restoreSelect(id,value){var node=el(id);if(node&&value)node.value=String(value);}
+function restoreSelect(id,value){
+var node=el(id);if(node&&value)node.value=String(value);
+}
+function showPrompt(title,prompt,returnAction){
+window._lastGeneratedPrompt=prompt;
+window._lastPromptReturnAction=returnAction||'launchIdeaDiscovery';
+modal(title,'<div class="template-box">'+esc(prompt)+'</div><div class="reader-actions">'+
+'<button class="gold" data-action="copyGeneratedPrompt">Copy Research Request</button>'+
+'<button class="secondary" data-action="openCreatorCoach">Open Creator Coach</button>'+
+'<button class="secondary" data-action="'+window._lastPromptReturnAction+'">Return</button>'+
+'</div>');
+}
+function launchIdeaDiscovery(prefill){
+prefill=prefill||{};
+modal('Stage 1 — Idea Discovery',
+'<div class="coach-intro"><b>Test the idea before you do the work.</b>'+
+'<p>This first stage helps you discover whether a viable version of the idea exists. You are not filling out the full strategy yet.</p></div>'+
+field('disIdea','Raw idea','textarea','Describe the idea in plain language. It can still be rough.')+
+field('disAudience','Possible audience','text','Who might care about this? It is okay to be broad for now.')+
+field('disWhy','Why this interests you','textarea','What makes you want to explore it?')+
+'<h3>Research the Landscape</h3>'+
+'<div class="research-actions">'+
+'<button class="secondary" data-action="buildDiscoveryResearchPrompt">Create Combined Research Request</button>'+
+'<button class="secondary" data-action="buildDemandResearchPrompt">Audience-Demand Request</button>'+
+'<button class="secondary" data-action="buildYouTubeResearchPrompt">Similar-Video Request</button>'+
+'</div>'+
+'<label>Paste research findings<textarea id="disResearch" placeholder="Paste the competitive scan, audience-demand findings, or both here."></textarea></label>'+
+'<p><button class="gold" data-action="analyzeDiscovery">Analyze the Opportunity</button></p>');
+
+setTimeout(function(){
+if(prefill.idea)el('disIdea').value=prefill.idea;
+if(prefill.audience)el('disAudience').value=prefill.audience;
+if(prefill.why)el('disWhy').value=prefill.why;
+if(prefill.research)el('disResearch').value=prefill.research;
+},0);
+}
+function buildDiscoveryResearchPrompt(){
+var idea=el('disIdea')?el('disIdea').value:'';
+var audience=el('disAudience')?el('disAudience').value:'';
+var prompt='Research and test this raw YouTube video idea before development.\n\n'+
+'RAW IDEA: '+(idea||'[idea]')+'\nPOSSIBLE AUDIENCE: '+(audience||'[audience]')+'\n\n'+
+'Complete two scans:\n\n'+
+'A. LIGHTWEIGHT AUDIENCE DEMAND\n'+
+'1. Size or prevalence of the broad audience\n'+
+'2. Recurring spend, time, maintenance, or pain\n'+
+'3. Emotional drivers\n'+
+'4. Major products, retailers, services, or industries\n'+
+'5. 5–8 current verified statistics with sources\n'+
+'6. Demand rating and confidence\n\n'+
+'B. COMPETITIVE LANDSCAPE\n'+
+'1. What already exists on YouTube and adjacent platforms\n'+
+'2. Repeated formats, promises, titles, and thumbnails\n'+
+'3. Saturated angles\n'+
+'4. What could not be found\n'+
+'5. Underserved audiences or missing combinations\n'+
+'6. The strongest white-space opportunity\n'+
+'7. Biggest positioning risk\n'+
+'8. Recommended angle\n'+
+'9. Preliminary decision: Continue, Reframe, Research More, or Park\n\n'+
+'Clearly separate verified facts, estimates, inference, and unknowns. Include links and citations. Do not invent statistics or claim uniqueness without evidence.';
+showPrompt('Combined Idea Discovery Research Request',prompt,'launchIdeaDiscovery');
+}
+function buildDemandResearchPrompt(){
+var idea=(el('disIdea')&&el('disIdea').value)||(el('ivIdea')&&el('ivIdea').value)||'[idea]';
+var viewer=(el('disAudience')&&el('disAudience').value)||(el('ivViewer')&&el('ivViewer').value)||'[target viewer]';
+var prompt='Conduct a lightweight audience-demand research scan for this YouTube idea.\n\nIDEA: '+idea+'\nPOSSIBLE AUDIENCE: '+viewer+'\n\nReturn:\n1. 5–8 current, verified statistics\n2. Size or prevalence of the affected audience\n3. Recurring spending, maintenance frequency, or time investment\n4. Major products, retailers, services, or industries\n5. Common consumer frustrations and emotional drivers\n6. Demand rating\n7. Confidence level\n8. What the evidence means for the video\n9. Three sourced talking points suitable for a script\n10. Links and citations for every factual claim\n\nClearly distinguish verified facts, estimates, inference, and unknowns. Do not invent statistics.';
+showPrompt('Audience-Demand Research Request',prompt,el('disIdea')?'launchIdeaDiscovery':'launchIdeaValidator');
+}
+function buildYouTubeResearchPrompt(){
+var idea=(el('disIdea')&&el('disIdea').value)||(el('ivIdea')&&el('ivIdea').value)||'[idea]';
+var viewer=(el('disAudience')&&el('disAudience').value)||(el('ivViewer')&&el('ivViewer').value)||'[target viewer]';
+var prompt='Research similar YouTube videos for this idea.\n\nIDEA: '+idea+'\nPOSSIBLE AUDIENCE: '+viewer+'\n\nFind current relevant videos and summarize:\n1. What already exists\n2. Repeated title patterns\n3. Common thumbnail concepts\n4. Dominant promises and formats\n5. Saturated angles\n6. What could not be found\n7. Underserved audiences or missing combinations\n8. Three differentiated angles\n9. Biggest positioning risk\n10. Sources and links\n\nDo not claim certainty where data is limited. Make “What could not be found” a prominent section.';
+showPrompt('Similar-Video Research Request',prompt,el('disIdea')?'launchIdeaDiscovery':'launchIdeaValidator');
+}
+function extractSection(text,patterns,fallback){
+var lower=text.toLowerCase();
+for(var i=0;i<patterns.length;i++){
+var idx=lower.indexOf(patterns[i].toLowerCase());
+if(idx>=0){
+var tail=text.slice(idx+patterns[i].length);
+var next=tail.search(/\n#{1,3}\s|\n[A-Z][A-Za-z ]{3,}:\s|\n### /);
+return (next>0?tail.slice(0,next):tail).trim().slice(0,1200);
+}
+}
+return fallback;
+}
+function analyzeDiscovery(){
+var idea=el('disIdea').value.trim();
+var audience=el('disAudience').value.trim();
+var why=el('disWhy').value.trim();
+var research=el('disResearch').value.trim();
+if(!idea){toast('Enter the raw idea first.');return;}
+if(!research){toast('Paste research findings before analysis.');return;}
+
+var exists=extractSection(research,['What already exists','What exists'],'Similar content already exists in the market.');
+var missing=extractSection(research,['What I could not find','What could not be found','Missing combinations'],'A clearly documented gap was not identified in the pasted research.');
+var meaning=extractSection(research,['What this means for your video','What this means','Recommendation'],'The idea needs a clearer strategic interpretation.');
+var demand=extractSection(research,['Demand Rating','Audience Demand','Moderate-High','High confidence'],'The underlying demand appears promising but should be interpreted carefully.');
+
+var hasGap=/could not find|no channel|underserved|white[- ]space|gap|missing combination|not really turned into|does not appear/i.test(research);
+var saturated=/saturated|widespread|already been made|micro-trend|countless creators/i.test(research);
+var strongDemand=/moderate-high|high demand|large audience|tens of millions|recurring spend|evergreen|proven pull/i.test(research);
+
+var decision=hasGap?'Continue with a Repositioned Angle':strongDemand?'Continue — Clarify the Angle':saturated?'Reframe Before Development':'Research More';
+var opportunity=missing;
+var risk=saturated?'Do not lead with the most common or already-saturated version of the idea.':'The biggest risk is moving forward before the positioning is specific enough.';
+var recommended=meaning;
+
+var discovery={
+id:Date.now(),idea:idea,audience:audience,why:why,research:research,
+exists:exists,missing:missing,demand:demand,opportunity:opportunity,risk:risk,recommended:recommended,decision:decision
+};
+data.discoveries=data.discoveries||[];
+data.discoveries.unshift(discovery);
+save();
+window._lastDiscovery=discovery;
+
+modal('Stage 1 Decision — Idea Discovery',
+'<div class="decision-banner"><b>Preliminary Decision:</b> '+esc(decision)+'</div>'+
+'<h3>What Already Exists</h3><div class="callout">'+esc(exists)+'</div>'+
+'<h3>What Could Not Be Found</h3><div class="white-space-card">'+esc(missing)+'</div>'+
+'<h3>Audience-Demand Signal</h3><div class="callout">'+esc(demand)+'</div>'+
+'<h3>White-Space Opportunity</h3><div class="white-space-card">'+esc(opportunity)+'</div>'+
+'<h3>Biggest Risk</h3><div class="callout">'+esc(risk)+'</div>'+
+'<h3>Recommended Angle</h3><div class="callout">'+esc(recommended)+'</div>'+
+'<div class="reader-actions">'+
+(decision.indexOf('Continue')===0?'<button class="gold" data-action="continueToDevelopment">Continue to Stage 2</button>':'')+
+'<button class="secondary" data-action="reviseDiscovery">Revise Raw Idea</button>'+
+'<button class="secondary" data-page="ideas">Save to Idea Vault</button>'+
+'</div>');
+}
+function reviseDiscovery(){
+var d=window._lastDiscovery||{};
+launchIdeaDiscovery({idea:d.idea||'',audience:d.audience||'',why:d.why||'',research:d.research||''});
+}
+function continueToDevelopment(){
+var d=window._lastDiscovery||{};
+launchIdeaValidator({
+idea:d.idea||'',
+viewer:d.audience||'',
+promise:'',
+angle:d.recommended||d.opportunity||'',
+proof:'',
+cred:'',
+notes:d.research||'',
+choices:{}
+});
+}
 function launchIdeaValidator(prefill){
 prefill=prefill||{};
-modal('Idea Coach — Evidence-Based Evaluation',
-'<div class="coach-intro"><b>You bring the idea. The Creator OS helps you build the case for it.</b><p>This version separates broad market demand from the specific AI angle, critiques your written answers, and helps you decide whether to approve, revise, research, or park the idea.</p></div>'+
-'<h3>1. Define the Idea</h3>'+
-field('ivIdea','Working idea','textarea','Describe the video idea in one or two sentences.')+
+modal('Stage 2 — Idea Development',
+'<div class="coach-intro"><b>Develop the strongest version of the idea.</b>'+
+'<p>Stage 1 tested the opportunity. Now define the promise, proof, credibility, and final viability.</p></div>'+
+'<h3>1. Define the Developed Idea</h3>'+
+field('ivIdea','Working idea','textarea','Describe the developed idea.')+
 field('ivViewer','Target viewer','text','Who specifically is this for?')+
 field('ivPromise','Viewer promise','textarea','What will the viewer know, feel, avoid, save, or achieve?')+
-field('ivAngle','Distinctive angle','textarea','Why this video instead of a standard version of the topic?')+
+field('ivAngle','Distinctive angle','textarea','What is the white-space position?')+
 field('ivProof','What can you show?','textarea','Before/after, test, result, process, evidence, cost, or transformation')+
 field('ivCred','Why are you credible to make it?','textarea','Personal experience, real experiment, expertise, or case study')+
 '<h3>2. Lightweight Audience Demand Evidence</h3>'+
-demandQuestion('dCommon','How common is the underlying problem or desire?','Think about the broad topic, not only your exact AI angle.',[[4,'Very common — affects a large group'],[3,'Common within a defined audience'],[2,'Narrow or occasional'],[1,'I do not know']])+
-demandQuestion('dFrequency','How often does the problem occur?','Recurring needs usually create stronger demand than one-time needs.',[[4,'Continuously or repeatedly'],[3,'Several times a year'],[2,'Occasionally'],[1,'Rarely or unknown']])+
-demandQuestion('dSpend','Do people already spend meaningful money or time solving it?','Existing spending is a strong market signal.',[[4,'Significant recurring money or time'],[3,'Moderate spending or effort'],[2,'Low spending or effort'],[1,'Unknown']])+
-demandQuestion('dEmotion','How emotionally important is the outcome?','Examples: saving money, confidence, appearance, independence, fear of mistakes.',[[4,'Highly emotional or high stakes'],[3,'Meaningful but not urgent'],[2,'Mostly practical'],[1,'Unclear']])+
-demandQuestion('dEvidence','What evidence do you already have?','Select the strongest evidence you currently have.',[[4,'Multiple signals: search, spending, products, questions, personal experience'],[3,'Some evidence from products, questions, videos, or personal experience'],[2,'Mostly personal intuition'],[1,'No evidence yet']])+
+demandQuestion('dCommon','How common is the underlying problem or desire?','Think about the broad topic.',[[4,'Very common — affects a large group'],[3,'Common within a defined audience'],[2,'Narrow or occasional'],[1,'I do not know']])+
+demandQuestion('dFrequency','How often does the problem occur?','Recurring needs usually create stronger demand.',[[4,'Continuously or repeatedly'],[3,'Several times a year'],[2,'Occasionally'],[1,'Rarely or unknown']])+
+demandQuestion('dSpend','Do people spend meaningful money or time solving it?','Existing spend is a strong signal.',[[4,'Significant recurring money or time'],[3,'Moderate spending or effort'],[2,'Low spending or effort'],[1,'Unknown']])+
+demandQuestion('dEmotion','How emotionally important is the outcome?','Money, confidence, appearance, independence, fear, relief.',[[4,'Highly emotional or high stakes'],[3,'Meaningful but not urgent'],[2,'Mostly practical'],[1,'Unclear']])+
+demandQuestion('dEvidence','What evidence do you have?','Select the strongest current evidence.',[[4,'Multiple verified signals'],[3,'Some evidence'],[2,'Mostly intuition'],[1,'No evidence yet']])+
 '<h3>3. Specific Video Angle</h3>'+
-selectField('ivVisualScore','Visual proof','Can the result or transformation be clearly shown?')+
-selectField('ivOriginal','Originality','Does the angle feel meaningfully different from common videos on the topic?')+
-selectField('ivFit','Channel fit','Does it support “Come build an AI-powered life with me”?')+
-selectField('ivCredScore','Credibility','Can you show real experience, evidence, or a genuine experiment?')+
-selectField('ivSeries','Series potential','Could this naturally lead to another useful video?')+
-'<h3>4. Research Support</h3>'+
-'<div class="research-actions"><button class="secondary" data-action="buildDemandResearchPrompt">Create Audience-Demand Research Request</button><button class="secondary" data-action="buildYouTubeResearchPrompt">Create Similar-Video Research Request</button></div>'+
-'<label>Research notes or statistics<textarea id="ivResearchNotes" placeholder="Paste verified statistics, market notes, links, or similar-video observations here."></textarea></label>'+
-'<p><button class="gold" data-action="scoreIdea">Evaluate My Idea</button></p>');
+selectField('ivVisualScore','Visual proof','Can the result be shown?')+
+selectField('ivOriginal','Positioning originality','Is your angle meaningfully different, even if the topic is not new?')+
+selectField('ivFit','Channel fit','Does it support the channel promise?')+
+selectField('ivCredScore','Credibility','Can you show real evidence?')+
+selectField('ivSeries','Series potential','Could this lead to another useful video?')+
+'<label>Research notes<textarea id="ivResearchNotes" placeholder="Stage 1 research will appear here."></textarea></label>'+
+'<p><button class="gold" data-action="scoreIdea">Evaluate Developed Idea</button></p>');
 
 setTimeout(function(){
 if(prefill.idea)el('ivIdea').value=prefill.idea;
@@ -209,40 +356,18 @@ var strong=words>=limits[type];
 var guidance={
 viewer:'Narrow the viewer by life stage, repeated behavior, pain point, or desired result.',
 promise:'Focus on one believable outcome instead of stacking too many benefits.',
-angle:'Make the AI experiment, financial stakes, constraint, or personal test the center of the story.',
+angle:'State the market gap or positioning advantage clearly.',
 proof:'Add before-and-after, receipts, screenshots, exact costs, mistakes, and a final result.',
-cred:'Add concrete experience, previous attempts, limits, and evidence—not only a general claim.'
+cred:'Add concrete experience, prior attempts, limits, and evidence.'
 };
 var rewrites={
-viewer:'Women over 40 who regularly manage this problem and want a practical AI-assisted alternative.',
-promise:'Show the viewer how AI can help make a safer, more informed decision and reduce recurring cost or effort.',
-angle:'Test whether ChatGPT can help replace part of an expensive recurring service through a real documented experiment.',
-proof:'Show the starting point, the ChatGPT guidance, shopping list, exact cost, process, mistakes, and final result.',
-cred:'Explain your prior experience, what you already know, what you do not know, and how you will document the experiment honestly.'
+viewer:'A specific audience with a recurring problem and a clear reason to care.',
+promise:'A single, believable viewer outcome tied to the research.',
+angle:'A clear white-space position that explains why this version deserves attention.',
+proof:'A documented process with evidence, comparison, cost, mistakes, and final result.',
+cred:'A transparent explanation of your experience, limits, and real experiment.'
 };
 return {status:strong?'Strong foundation':'Needs strengthening',feedback:strong?'Specific enough to support the next step.':guidance[type],rewrite:strong?text:rewrites[type]};
-}
-function demandAdvice(key,value){
-var map={
-common:{4:'The underlying topic appears relevant to a large audience.',3:'The topic has a meaningful defined audience.',2:'The audience may be narrow or the need may be occasional.',1:'The size of the affected audience still needs research.'},
-frequency:{4:'Recurring frequency supports repeat interest and ongoing spending.',3:'The need returns often enough to support meaningful demand.',2:'Occasional frequency weakens urgency.',1:'The maintenance cycle or frequency is unknown.'},
-spend:{4:'Existing recurring spending is a powerful market signal.',3:'People already invest moderate money or time in the problem.',2:'Low spending may mean lower urgency.',1:'You need evidence about what people currently spend or sacrifice.'},
-emotion:{4:'The outcome carries strong emotional stakes.',3:'The outcome matters, but the emotional driver should be clearer.',2:'The idea is practical but may not yet feel compelling.',1:'Identify the emotional reason the viewer cares.'},
-evidence:{4:'You already have multiple demand signals.',3:'You have enough evidence for a preliminary judgment.',2:'The idea currently relies too heavily on intuition.',1:'Run lightweight market and YouTube research before approval.'}
-};
-return map[key][value]||map[key][1];
-}
-function showPrompt(title,prompt){
-window._lastGeneratedPrompt=prompt;
-modal(title,'<div class="template-box">'+esc(prompt)+'</div><div class="reader-actions"><button class="gold" data-action="copyGeneratedPrompt">Copy Research Request</button><button class="secondary" data-action="openCreatorCoach">Open Creator Coach</button><button class="secondary" data-action="close">Return to Idea Coach</button></div>');
-}
-function buildDemandResearchPrompt(){
-var prompt='Conduct a lightweight audience-demand research scan for this YouTube video idea.\n\nIDEA: '+(el('ivIdea').value||'[idea]')+'\nTARGET VIEWER: '+(el('ivViewer').value||'[target viewer]')+'\nPROMISE: '+(el('ivPromise').value||'[viewer promise]')+'\n\nReturn:\n1. 5–8 current, verified statistics\n2. Size or prevalence of the affected audience\n3. Recurring spending, maintenance frequency, or time investment\n4. Major products, retailers, or services in the category\n5. Common consumer frustrations and emotional drivers\n6. Demand rating\n7. Confidence level\n8. What the evidence means for this video\n9. Three sourced talking points suitable for the script\n10. Links and citations for every factual claim\n\nClearly distinguish verified facts, estimates, inference, and unknowns. Do not invent statistics.';
-showPrompt('Audience-Demand Research Request',prompt);
-}
-function buildYouTubeResearchPrompt(){
-var prompt='Research similar YouTube videos for this idea.\n\nIDEA: '+(el('ivIdea').value||'[idea]')+'\nTARGET VIEWER: '+(el('ivViewer').value||'[target viewer]')+'\n\nFind current relevant videos and summarize:\n1. Repeated title patterns\n2. Common thumbnail concepts\n3. Dominant promises and angles\n4. Approximate views and publish dates\n5. Possible outliers\n6. Audience questions or gaps\n7. Oversaturated approaches\n8. Three differentiated angles\n9. Sources and links\n\nDo not claim certainty where data is limited.';
-showPrompt('Similar-Video Research Request',prompt);
 }
 function categoryCard(label,score,max,bandText,feedback){
 return '<article class="coach-breakdown"><div><b>'+label+'</b><span>'+bandText+'</span></div><strong>'+score+'/'+max+'</strong><p>'+feedback+'</p></article>';
@@ -263,19 +388,19 @@ var item={id:Date.now(),title:el('ivIdea').value,audience:el('ivViewer').value,p
 data.ideas.unshift(item);save();window._lastIdeaForRevision=item;
 
 var demandCards=[
-categoryCard('Audience Size',scaled(raw.common,12),12,labelBand(raw.common),demandAdvice('common',raw.common)),
-categoryCard('Recurring Need',scaled(raw.frequency,8),8,labelBand(raw.frequency),demandAdvice('frequency',raw.frequency)),
-categoryCard('Existing Spend',scaled(raw.spend,10),10,labelBand(raw.spend),demandAdvice('spend',raw.spend)),
-categoryCard('Emotional Stakes',scaled(raw.emotion,10),10,labelBand(raw.emotion),demandAdvice('emotion',raw.emotion)),
-categoryCard('Evidence Quality',scaled(raw.evidence,10),10,labelBand(raw.evidence),demandAdvice('evidence',raw.evidence))
+categoryCard('Audience Size',scaled(raw.common,12),12,labelBand(raw.common),'How large is the broad underlying audience?'),
+categoryCard('Recurring Need',scaled(raw.frequency,8),8,labelBand(raw.frequency),'How often does the need return?'),
+categoryCard('Existing Spend',scaled(raw.spend,10),10,labelBand(raw.spend),'Do people already invest money or time?'),
+categoryCard('Emotional Stakes',scaled(raw.emotion,10),10,labelBand(raw.emotion),'How much does the outcome matter emotionally?'),
+categoryCard('Evidence Quality',scaled(raw.evidence,10),10,labelBand(raw.evidence),'How strong is the supporting evidence?')
 ].join('');
 
 var angleCards=[
-categoryCard('Visual Proof',scores.visual,10,labelBand(raw.visual),raw.visual>=3?'The idea can be demonstrated visually.':'Plan a concrete before/after, test, comparison, or visible result.'),
-categoryCard('Originality',scores.original,10,labelBand(raw.original),raw.original>=3?'The angle has some differentiation.':'Make the AI experiment, stakes, or constraint more distinctive.'),
-categoryCard('Channel Fit',scores.fit,10,labelBand(raw.fit),raw.fit>=3?'The idea supports the channel promise.':'Make AI essential to the result—not merely mentioned.'),
-categoryCard('Credibility',scores.cred,10,labelBand(raw.cred),raw.cred>=3?'You can build trust with real evidence.':'Show the process, limits, receipts, mistakes, and result.'),
-categoryCard('Series Potential',scores.series,10,labelBand(raw.series),raw.series>=3?'The idea can support a continuing journey.':'Add a follow-up experiment, update, or next-stage question.')
+categoryCard('Visual Proof',scores.visual,10,labelBand(raw.visual),raw.visual>=3?'The result can be demonstrated visually.':'Plan a concrete before/after, test, or result.'),
+categoryCard('Positioning Originality',scores.original,10,labelBand(raw.original),raw.original>=3?'The angle is differentiated even if the topic is not new.':'State the market gap more clearly.'),
+categoryCard('Channel Fit',scores.fit,10,labelBand(raw.fit),raw.fit>=3?'The idea supports the channel promise.':'Make AI essential to the result.'),
+categoryCard('Credibility',scores.cred,10,labelBand(raw.cred),raw.cred>=3?'You can build trust with evidence.':'Show the process, limits, mistakes, and result.'),
+categoryCard('Series Potential',scores.series,10,labelBand(raw.series),raw.series>=3?'The idea can support a continuing journey.':'Add a follow-up experiment or progress update.')
 ].join('');
 
 var writtenRows=[['Target Viewer','viewer'],['Viewer Promise','promise'],['Distinctive Angle','angle'],['Visual Proof','proof'],['Credibility','cred']].map(function(r){
@@ -283,14 +408,13 @@ var review=written[r[1]];
 return '<article class="written-review"><h4>'+r[0]+' <span>'+review.status+'</span></h4><p>'+review.feedback+'</p><div class="rewrite"><b>Suggested refinement:</b><br>'+esc(review.rewrite)+'</div></article>';
 }).join('');
 
-modal('Idea Coach Decision',
+modal('Stage 2 Decision — Developed Idea',
 '<div class="result-score">'+total+'<span>/100</span></div><h3 class="verdict">'+verdict+'</h3>'+
 '<div class="decision-banner"><b>Audience Demand:</b> '+demandRating+' &nbsp; <b>Confidence:</b> '+confidence+'</div>'+
-'<h3>Lightweight Audience-Demand Assessment</h3><div class="coach-grid">'+demandCards+'</div>'+
-'<h3>Specific Video-Angle Assessment</h3><div class="coach-grid">'+angleCards+'</div>'+
+'<h3>Audience-Demand Assessment</h3><div class="coach-grid">'+demandCards+'</div>'+
+'<h3>Positioning and Video-Angle Assessment</h3><div class="coach-grid">'+angleCards+'</div>'+
 '<h3>Written Answer Review</h3><div class="written-grid">'+writtenRows+'</div>'+
-'<h3>Research Status</h3><div class="callout">'+(item.researchNotes.trim()?'You added research notes. Verify every statistic and source before using it in the script.':'No research notes have been added yet. Use the research-request buttons when the decision depends on market size or current YouTube evidence.')+'</div>'+
-'<h3>Decision</h3><div class="callout">'+(verdict==='Approve for Video Brief'?'The idea has enough evidence and clarity to advance.':verdict==='Revise and Rescore'?'The idea is viable, but strengthen the written framing or weaker categories before approval.':verdict==='Research More'?'The core may be promising, but the evidence is not yet strong enough to justify production.':'Protect your production time. Reframe the idea or place it in the parking lot.')+'</div>'+
+'<h3>Decision</h3><div class="callout">'+(verdict==='Approve for Video Brief'?'The idea has enough evidence and clarity to advance.':verdict==='Revise and Rescore'?'The idea is viable, but strengthen weaker fields before approval.':verdict==='Research More'?'The evidence is not yet strong enough to justify production.':'Protect your production time. Reframe or park it.')+'</div>'+
 '<div class="reader-actions"><button class="gold" data-action="reviseIdea">Revise and Rescore</button>'+(verdict==='Approve for Video Brief'?'<button class="gold" data-action="launchBriefBuilder">Approve → Build Video Brief</button>':'')+'<button class="secondary" data-page="ideas">Save and Open Idea Vault</button></div>');
 }
 function reviseIdea(){
@@ -331,6 +455,12 @@ if(b.dataset.action==='scoreIdea')scoreIdea();
 if(b.dataset.action==='launchBriefBuilder')launchBriefBuilder();
 if(b.dataset.action==='saveBrief')saveBrief();
 if(b.dataset.action==='reviseIdea')reviseIdea();
+if(b.dataset.action==='launchIdeaDiscovery')launchIdeaDiscovery();
+if(b.dataset.action==='buildDiscoveryResearchPrompt')buildDiscoveryResearchPrompt();
+if(b.dataset.action==='analyzeDiscovery')analyzeDiscovery();
+if(b.dataset.action==='reviseDiscovery')reviseDiscovery();
+if(b.dataset.action==='continueToDevelopment')continueToDevelopment();
+
 if(b.dataset.action==='buildDemandResearchPrompt')buildDemandResearchPrompt();
 if(b.dataset.action==='buildYouTubeResearchPrompt')buildYouTubeResearchPrompt();
 if(b.dataset.action==='copyGeneratedPrompt'){
@@ -347,7 +477,7 @@ else{show('settings');toast('Add your Creator Coach URL in Settings.');}
 if(b.dataset.copyResource){var r=library.find(function(x){return String(x.id)===String(b.dataset.copyResource)});navigator.clipboard.writeText(resourcePlainText(r)).then(function(){toast('Resource copied')}).catch(function(){toast('Select and copy the text manually')})}
 if(b.dataset.action==='boost')el('boostText').textContent='“'+boosts[Math.floor(Math.random()*boosts.length)]+'”';
 if(b.dataset.action==='coach'){if(data.settings.coach)window.open(data.settings.coach,'_blank');else show('settings')}
-if(b.dataset.action==='newIdea')launchIdeaValidator();
+if(b.dataset.action==='newIdea')launchIdeaDiscovery();
 if(b.dataset.action==='saveIdea'){data.ideas.unshift({id:Date.now(),title:el('ni').value,audience:el('na').value,status:'Captured',score:''});save();el('modal').classList.remove('open');show('ideas')}
 if(b.dataset.action==='close')el('modal').classList.remove('open');
 if(b.dataset.action==='saveSettings'){data.settings={subs:Number(el('ss').value),subsGoal:Number(el('sg').value),hours:Number(el('sh').value),hoursGoal:Number(el('shg').value),projection:el('sp').value,coach:el('sc').value};save();render();toast('Saved')}
