@@ -1,10 +1,169 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Well, That's Handy — Creator OS</title><link rel="stylesheet" href="styles.css"></head><body>
-<div class="app"><aside class="side"><div class="logo"><div class="ai">AI</div><small>PRACTICAL AI<br>FOR EVERYDAY LIFE</small></div><nav id="nav"></nav><blockquote>“The audience you want to reach cannot discover the work you never publish.”</blockquote></aside>
-<main><header class="hero"><div class="heroLeft"><img src="creator-photo.jpg"><div class="fade"></div><div class="copy"><div class="script">Well, That’s Handy</div><div class="tag">REAL LIFE. REAL PROJECTS. REAL AI ANYONE CAN USE.</div></div></div><div class="command"><h1>CREATOR COMMAND CENTER</h1><div><button data-page="calendar">▦<span>Plan</span></button><button data-page="projects">▶<span>Create</span></button><button data-page="analytics">▥<span>Analyze</span></button><button data-page="goals">🚀<span>Grow</span></button></div></div></header>
-<section id="home" class="page active"><div class="top"><article class="card"><h2>MONETIZATION PROGRESS</h2><div class="metrics"><div><small>SUBSCRIBERS</small><b id="subsText"></b><div class="bar"><i id="subsBar"></i></div><span id="subsPct"></span></div><div><small>WATCH HOURS</small><b id="hoursText"></b><div class="bar"><i id="hoursBar"></i></div><span id="hoursPct"></span></div></div><p class="success">✓ On track for monetization!</p></article><article class="card center"><h2>OVERALL PROGRESS</h2><div class="ring" id="ring" data-v="75%"></div><p>You’re making great progress!</p></article><article class="card"><h2>PROJECTED MONETIZATION</h2><div class="projected">📅 <span id="projection"></span></div><p>Keep going! You’re building something meaningful.</p></article><article class="focus"><h2>🎯 TODAY’S FOCUS</h2><strong id="focusStage"></strong><span id="focusTitle"></span><p><b>Next Action:</b><br><span id="focusAction"></span></p><button class="gold" data-page="projects">OPEN PROJECT →</button></article></div>
-<article class="card workflowCard"><h2>YOUR CREATOR WORKFLOW</h2><div class="workflow" id="workflow"></div></article>
-<div class="mid"><article class="card"><h2>QUICK ACTIONS</h2><div class="quick"><button data-action="newIdea">💡<b>NEW IDEA</b></button><button data-page="reviews">★<b>START REVIEW</b></button><button data-action="coach">●<b>ASK COACH</b></button><button data-page="calendar">▦<b>VIEW CALENDAR</b></button><button data-page="ideas">▰<b>IDEA VAULT</b></button><button data-page="resources">▤<b>RESOURCE LIBRARY</b></button><button data-page="resources">▤<b>TEMPLATES</b></button><button data-page="resources">☑<b>EQUIPMENT CHECKLIST</b></button></div></article><article class="card center"><h2>CREATOR ENCOURAGEMENT</h2><blockquote id="boostText"></blockquote><button class="navy" data-action="boost">GIVE ME A BOOST</button></article><article class="card"><h2>RECENT PROJECTS</h2><div id="recentProjects"></div></article></div>
-<div class="bottom"><article class="card"><h2>RECENT PERFORMANCE</h2><div id="performance"></div><button data-page="analytics" class="text">Open Analytics Dashboard →</button></article><article class="card"><h2>CONTENT CALENDAR</h2><div id="calendarMini"></div><button data-page="calendar" class="text">Open Calendar →</button></article><article class="card center"><h2>NEXT REVIEW</h2><div id="nextReview"></div><button data-page="reviews" class="gold">START REVIEW</button></article><article class="card"><h2>TOOLS & RESOURCES</h2><div id="resourceMini" class="resourceMini"></div></article></div></section>
-<section id="ideas" class="page"></section><section id="projects" class="page"></section><section id="workflowPage" class="page"></section><section id="reviews" class="page"></section><section id="analytics" class="page"></section><section id="calendar" class="page"></section><section id="resources" class="page"></section><section id="assets" class="page"></section><section id="goals" class="page"></section><section id="settings" class="page"></section>
-<footer><em>Built with purpose. Created with intention. Shared to help others.</em><span>♥ You’re building something that matters.</span><span>© 2026 Well, That’s Handy</span></footer></main></div>
-<div class="modal" id="modal"><div class="dialog"><button class="close" data-action="close">×</button><div id="modalBody"></div></div></div><div class="toast" id="toast"></div><script src="app.js"></script></body></html>
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Well, That's Handy — Creator OS v0.2</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="logo">
+      <div class="ai">AI</div>
+      <small>COME BUILD AN<br>AI-POWERED LIFE WITH ME</small>
+    </div>
+    <nav id="nav"></nav>
+    <blockquote>“The audience you want to reach cannot discover the work you never publish.”</blockquote>
+  </aside>
+
+  <main>
+    <header class="hero">
+      <div class="heroLeft">
+        <img src="creator-photo.jpg" alt="Carolynn with her dog">
+        <div class="fade"></div>
+        <div class="copy">
+          <div class="script">Well, That’s Handy</div>
+          <div class="tag">COME BUILD AN AI-POWERED LIFE WITH ME.</div>
+        </div>
+      </div>
+      <div class="command">
+        <h1>CREATOR COMMAND CENTER</h1>
+        <div>
+          <button data-page="calendar">▦<span>Plan</span></button>
+          <button data-page="projects">▶<span>Create</span></button>
+          <button data-page="analytics">▥<span>Analyze</span></button>
+          <button data-page="goals">🚀<span>Grow</span></button>
+        </div>
+      </div>
+    </header>
+
+    <section id="home" class="page active">
+      <div class="top">
+        <article class="card">
+          <h2>MONETIZATION PROGRESS</h2>
+          <div class="metrics">
+            <div>
+              <small>SUBSCRIBERS</small>
+              <b id="subsText"></b>
+              <div class="bar"><i id="subsBar"></i></div>
+              <span id="subsPct"></span>
+            </div>
+            <div>
+              <small>WATCH HOURS</small>
+              <b id="hoursText"></b>
+              <div class="bar"><i id="hoursBar"></i></div>
+              <span id="hoursPct"></span>
+            </div>
+          </div>
+          <p class="success">✓ On track for monetization!</p>
+        </article>
+
+        <article class="card center">
+          <h2>OVERALL PROGRESS</h2>
+          <div class="ring" id="ring" data-v="75%"></div>
+          <p>You’re making great progress!</p>
+        </article>
+
+        <article class="card">
+          <h2>PROJECTED MONETIZATION</h2>
+          <div class="projected">📅 <span id="projection"></span></div>
+          <p>Keep going! You’re building something meaningful.</p>
+        </article>
+
+        <article class="focus">
+          <h2>🎯 TODAY’S FOCUS</h2>
+          <strong id="focusStage"></strong>
+          <span id="focusTitle"></span>
+          <p><b>Next Action:</b><br><span id="focusAction"></span></p>
+          <button class="gold" data-page="projects">OPEN PROJECT →</button>
+        </article>
+      </div>
+
+      <article class="card workflowCard">
+        <h2>YOUR CREATOR WORKFLOW</h2>
+        <div class="workflow" id="workflow"></div>
+      </article>
+
+      <div class="mid">
+        <article class="card">
+          <h2>QUICK ACTIONS</h2>
+          <div class="quick">
+            <button data-action="newIdea">💡<b>NEW IDEA</b></button>
+            <button data-page="reviews">★<b>START REVIEW</b></button>
+            <button data-action="coach">●<b>ASK COACH</b></button>
+            <button data-page="calendar">▦<b>VIEW CALENDAR</b></button>
+            <button data-page="ideas">▰<b>IDEA VAULT</b></button>
+            <button data-page="resources">▤<b>CREATOR LIBRARY</b></button>
+            <button data-page="resources" data-resource-filter="Templates">▤<b>TEMPLATES</b></button>
+            <button data-page="resources" data-resource-filter="Checklists">☑<b>CHECKLISTS</b></button>
+          </div>
+        </article>
+
+        <article class="card center">
+          <h2>CREATOR ENCOURAGEMENT</h2>
+          <blockquote id="boostText"></blockquote>
+          <button class="navy" data-action="boost">GIVE ME A BOOST</button>
+        </article>
+
+        <article class="card">
+          <h2>RECENT PROJECTS</h2>
+          <div id="recentProjects"></div>
+        </article>
+      </div>
+
+      <div class="bottom">
+        <article class="card">
+          <h2>RECENT PERFORMANCE</h2>
+          <div id="performance"></div>
+          <button data-page="analytics" class="text">Open Analytics Dashboard →</button>
+        </article>
+
+        <article class="card">
+          <h2>CONTENT CALENDAR</h2>
+          <div id="calendarMini"></div>
+          <button data-page="calendar" class="text">Open Calendar →</button>
+        </article>
+
+        <article class="card center">
+          <h2>NEXT REVIEW</h2>
+          <div id="nextReview"></div>
+          <button data-page="reviews" class="gold">START REVIEW</button>
+        </article>
+
+        <article class="card">
+          <h2>TOOLS & RESOURCES</h2>
+          <div id="resourceMini" class="resourceMini"></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="ideas" class="page"></section>
+    <section id="projects" class="page"></section>
+    <section id="workflowPage" class="page"></section>
+    <section id="reviews" class="page"></section>
+    <section id="analytics" class="page"></section>
+    <section id="calendar" class="page"></section>
+    <section id="resources" class="page"></section>
+    <section id="assets" class="page"></section>
+    <section id="goals" class="page"></section>
+    <section id="settings" class="page"></section>
+
+    <footer>
+      <em>Built with purpose. Created with intention. Shared to help others.</em>
+      <span>♥ You’re building something that matters.</span>
+      <span>© 2026 Well, That’s Handy</span>
+    </footer>
+  </main>
+</div>
+
+<div class="modal" id="modal">
+  <div class="dialog">
+    <button class="close" data-action="close">×</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>
